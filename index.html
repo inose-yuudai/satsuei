@@ -1,0 +1,199 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex, nofollow">
+<meta name="referrer" content="no-referrer">
+<!-- 写真や動画を外に送れないように、つなぐ先をこのサイトだけに絞る -->
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'wasm-unsafe-eval'; connect-src 'self'; img-src 'self' data: blob:; media-src 'self' blob: mediastream:; style-src 'self' 'unsafe-inline'; worker-src 'self' blob:; object-src 'none'; base-uri 'none'; form-action 'none'">
+<meta name="theme-color" content="#0e0d12">
+<title>3D キャラ用の撮影</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<!-- ============ 1. はじめに ============ -->
+<section class="page" id="intro">
+  <div class="wrap">
+    <header class="hero">
+      <p class="eyebrow">3D キャラクター用</p>
+      <h1>あなたを撮影します</h1>
+      <p class="lead">あなたをもとに 3D のキャラクターを作るための写真を撮ります。画面と声の案内どおりに動くだけで、合ったところを自動で撮ります。</p>
+    </header>
+
+    <div class="inapp" id="inapp" hidden>
+      <b>アプリの中のブラウザで開いています</b>
+      <p>LINE などのアプリの中では、カメラや保存がうまく動かないことがあります。<span id="inapp_how">メニューから「ブラウザで開く」を選んでください。</span></p>
+      <a class="btn" id="inapp_link" href="?openExternalBrowser=1" hidden>ブラウザで開き直す</a>
+    </div>
+
+    <div class="card">
+      <h2>撮るもの<small id="total_time">全部で約 12 分</small></h2>
+      <ul class="phase-list" id="phase_list"></ul>
+      <p class="note">写真のほかに、短い動画（首を振る・しゃべる・手を動かす・その場で 1 周）を撮ります。声は録音しません。</p>
+    </div>
+
+    <div class="card privacy">
+      <h2>撮った写真のゆくえ</h2>
+      <ol class="flow">
+        <li><b>この端末の中だけ</b>に保存します。インターネットには送りません。</li>
+        <li>最後に、全部を <b>1 つの ZIP ファイル</b>にまとめて、この端末に保存します。</li>
+        <li>その ZIP を、<b>あなたが撮影を頼まれた人に、自分で送ってください</b>（LINE・メール・AirDrop など）。</li>
+        <li>送り終わったら「この端末から消す」で、撮った物を消せます。</li>
+      </ol>
+      <p class="note">ZIP には、写真・動画と、写真から計算した顔や手の形の数値（点の位置）、下で入れるお名前と撮影日が入ります。このページは、顔や手を見分けるプログラムを最初に読み込むだけで、ほかのサーバーにはつながらない作りです。</p>
+    </div>
+
+    <div class="card">
+      <h2>用意するもの</h2>
+      <ul class="prep">
+        <li><b>明るい部屋</b>：窓や照明を背にしない。顔に正面から光が当たるように</li>
+        <li><b>スマホを立てかける場所</b>：机の上と、全身用に 2〜3m 離れられる場所</li>
+        <li><b>ヘアピンかカチューシャ</b>：前髪を上げて 1 枚撮ります（前髪がない人は不要）</li>
+        <li><b>服装</b>：キャラクターにしたい服で。マスク・帽子は外してください</li>
+      </ul>
+    </div>
+
+    <div class="card">
+      <h2>あなたについて</h2>
+      <label class="field"><span class="lab">お名前<span class="req">必須</span></span>
+        <input type="text" id="name" maxlength="30" autocomplete="nickname" placeholder="例：山田 花子（ニックネームでも OK）">
+        <small>ZIP のファイル名に入ります。受け取った人が、だれの写真か分かるようにするためです。</small>
+      </label>
+      <label class="field"><span class="lab">身長（cm）<span class="opt">任意</span></span>
+        <input type="number" id="height" inputmode="decimal" min="80" max="230" step="0.5" placeholder="例：165">
+        <small>3D キャラクターの大きさを合わせるのに使います。</small>
+      </label>
+      <div class="field">撮る範囲
+        <div class="phase-pick" id="phasepick"></div>
+      </div>
+      <label class="switch"><input type="checkbox" id="voice" checked> 声で案内する（音が出ます）</label>
+    </div>
+
+    <label class="consent"><input type="checkbox" id="agree"> <span>上の内容を読みました。撮影して、できた ZIP を自分で送ることに同意します。</span></label>
+    <button class="primary big" id="to_camera" disabled>カメラの準備へ</button>
+    <button class="ghost" id="resume" hidden></button>
+    <p class="foot">撮影は途中でやめても、次に開いたときに続きから撮れます。</p>
+  </div>
+</section>
+
+<!-- ============ 2. カメラの許可 ============ -->
+<section class="page" id="perm" hidden>
+  <div class="wrap center">
+    <div class="perm-ic" aria-hidden="true">
+      <svg viewBox="0 0 64 64"><rect x="6" y="18" width="40" height="30" rx="7" fill="none" stroke="currentColor" stroke-width="4"/><path d="M46 28 L58 21 V45 L46 38 Z" fill="none" stroke="currentColor" stroke-width="4" stroke-linejoin="round"/></svg>
+    </div>
+    <h2 id="perm_title">カメラを使います</h2>
+    <p id="perm_text">このあと「カメラへのアクセスを許可しますか？」と出たら、<b>「許可」</b>を押してください。映像はこの端末の中だけで使います。</p>
+    <div class="perm-help" id="perm_help" hidden></div>
+    <button class="primary big" id="perm_go">カメラをオンにする</button>
+    <button class="ghost" id="perm_back">戻る</button>
+  </div>
+</section>
+
+<!-- ============ 3〜5. 撮影 ============ -->
+<main class="studio" id="studio" hidden>
+  <section class="stage" id="stage">
+    <video id="video" playsinline muted autoplay></video>
+    <canvas id="overlay"></canvas>
+    <div class="topbar">
+      <span class="chip" id="phasechip"></span>
+      <span class="count" id="stepno"></span>
+      <button type="button" class="mini" id="voicebtn" aria-label="声の案内">声：オン</button>
+    </div>
+    <div class="guide-tag" id="guidetag" hidden></div>
+    <div id="flash"></div>
+    <div id="bigcount" hidden></div>
+    <div class="overlay" id="phaseoverlay" hidden>
+      <div class="phasecard">
+        <div class="picto" id="pc_picto"></div>
+        <div class="eyebrow" id="pc_no"></div>
+        <h2 id="pc_name"></h2>
+        <p class="place" id="pc_place"></p>
+        <p id="pc_intro"></p>
+        <p class="tip" id="pc_tip"></p>
+        <button class="primary" type="button" id="pc_go">はじめる</button>
+        <span class="left" id="pc_left"></span>
+      </div>
+    </div>
+  </section>
+
+  <!-- 撮影の前のチェック -->
+  <section class="panel" id="ready">
+    <h2>準備のチェック</h2>
+    <div class="checks" id="checks"></div>
+    <div class="seg" role="radiogroup" aria-label="使うカメラ">
+      <button type="button" id="cam_user" class="on">自撮り<small>前のカメラ</small></button>
+      <button type="button" id="cam_env">人に撮ってもらう<small>後ろのカメラ</small></button>
+    </div>
+    <button class="primary big" id="go" disabled>撮影をはじめる</button>
+    <button class="ghost" id="ready_back">はじめの画面へ</button>
+  </section>
+
+  <!-- 撮影中 -->
+  <section class="panel" id="now" hidden>
+    <div id="farbox" hidden><div class="picto" id="farpicto"></div><div><div class="t" id="fartitle"></div><div class="h" id="farhint"></div></div></div>
+    <div class="nowhead">
+      <div class="picto" id="picto"></div>
+      <div class="nowtext">
+        <div class="meta" id="phasename"></div>
+        <h2 id="title"></h2>
+        <p id="say"></p>
+      </div>
+    </div>
+    <div class="status"><span class="pill" id="pill">準備中</span><div class="hold"><i id="holdfill"></i></div></div>
+    <div id="meter"></div>
+    <p id="hint" aria-live="polite"></p>
+    <div class="controls">
+      <button id="back" type="button">戻る</button>
+      <button id="pause" type="button">一時停止</button>
+      <button id="shoot" type="button" class="primary">今撮る</button>
+      <button id="skip" type="button">飛ばす</button>
+    </div>
+    <details class="steps"><summary>手順の一覧（押すとそこへ移動）</summary><div class="steplist" id="steplist"></div></details>
+  </section>
+</main>
+
+<!-- ============ 6. おわり・送る ============ -->
+<section class="page" id="finish" hidden>
+  <div class="wrap">
+    <header class="hero">
+      <p class="eyebrow">おつかれさまでした</p>
+      <h1>撮影おわり</h1>
+      <p class="lead" id="fin_lead"></p>
+    </header>
+
+    <div class="card send">
+      <h2>ZIP にまとめて送る</h2>
+      <ol class="flow">
+        <li>「ZIP を作る」を押します（数十秒かかることがあります）。</li>
+        <li>「保存する」か「送る」を押します。<span class="os-note" id="save_note"></span></li>
+        <li>その ZIP を、撮影を頼まれた人に送ってください。</li>
+      </ol>
+      <div class="zipinfo" id="zipinfo"></div>
+      <div class="progress" id="zipprog" hidden><i></i></div>
+      <button class="primary big" id="makezip">ZIP を作る</button>
+      <div class="row2" id="zipbtns" hidden>
+        <button class="primary big" id="savezip">保存する</button>
+        <button class="big" id="sharezip" hidden>送る（共有）</button>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2>撮った物<small>気になる物は撮り直せます</small></h2>
+      <div class="grid" id="fin_grid"></div>
+    </div>
+
+    <div class="card">
+      <h2>送り終わったら</h2>
+      <p class="note">撮った写真・動画は、ZIP を作ったあとも、このページの中（この端末のブラウザ）に残っています。送り終わったら消してください。保存した ZIP ファイルは消えないので、いらなければ「ファイル」アプリなどから消してください。</p>
+      <button class="danger" id="wipe">この端末から消す</button>
+    </div>
+  </div>
+</section>
+
+<div id="toast" role="status" hidden></div>
+<script type="module" src="app.js"></script>
+</body>
+</html>
