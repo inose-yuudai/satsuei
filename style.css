@@ -79,11 +79,11 @@ input[type=checkbox] { accent-color: var(--pink); width: 20px; height: 20px; mar
 .stage video, .stage canvas { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: contain; }
 body.mirror .stage video, body.mirror .stage canvas { transform: scaleX(-1); }
 .topbar { position: absolute; top: calc(8px + var(--safe-t)); left: 8px; right: 8px; display: flex; gap: 8px; align-items: center; z-index: 3; }
-.topbar .chip { background: rgba(0,0,0,.6); color: #fff; padding: 5px 12px; border-radius: 999px; font-size: .82rem; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-width: 0; }
+.topbar .chip { background: rgba(0,0,0,.6); color: #fff; padding: 7px 12px; border-radius: 999px; font-size: .82rem; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-width: 0; }
 .topbar .chip:empty { display: none; }
-.topbar .count { background: rgba(0,0,0,.6); color: #ddd; padding: 5px 10px; border-radius: 999px; font-size: .82rem; font-variant-numeric: tabular-nums; }
+.topbar .count { background: rgba(0,0,0,.6); color: #ddd; padding: 7px 10px; border-radius: 999px; font-size: .82rem; font-variant-numeric: tabular-nums; }
 .topbar .count:empty { display: none; }
-.topbar .mini { margin-left: auto; background: rgba(0,0,0,.6); border-color: transparent; color: #fff; padding: 5px 12px; border-radius: 999px; font-size: .82rem; }
+.topbar .mini { margin-left: auto; background: rgba(0,0,0,.6); border-color: transparent; color: #fff; padding: 8px 14px; border-radius: 999px; font-size: .82rem; }
 .guide-tag { position: absolute; left: 50%; bottom: 10px; transform: translateX(-50%); background: rgba(0,0,0,.6); color: #fff; padding: 5px 12px; border-radius: 999px; font-size: .82rem; pointer-events: none; white-space: nowrap; }
 #flash { position: absolute; inset: 0; background: #fff; opacity: 0; pointer-events: none; }
 #flash.on { animation: flash .35s ease-out; }
@@ -92,17 +92,17 @@ body.mirror .stage video, body.mirror .stage canvas { transform: scaleX(-1); }
 #bigcount.rec { color: var(--rec); font-size: min(8vh, 9vw, 80px); place-items: start center; padding-top: calc(52px + var(--safe-t)); }
 
 /* 全身のとき：2〜3m 先から読める大きな表示 */
-#farbox { display: grid; grid-template-columns: 26% 1fr; gap: 12px; align-items: center; background: rgba(14,13,18,.84); border: 2px solid var(--pink); border-radius: 18px; padding: 12px; }
-#farbox .t { font-size: clamp(26px, 7.5vw, 52px); font-weight: 800; line-height: 1.15; }
-#farbox .h { font-size: clamp(20px, 5.6vw, 36px); font-weight: 700; color: var(--pink); line-height: 1.25; margin-top: 4px; }
+#farbox { display: grid; grid-template-columns: 84px 1fr; gap: 12px; align-items: center; background: rgba(14,13,18,.84); border: 2px solid var(--pink); border-radius: 18px; padding: 12px; }
+#farbox .t { font-size: clamp(24px, 7vw, 52px); font-weight: 800; line-height: 1.15; }
+#farbox .h { font-size: clamp(26px, 8.4vw, 44px); font-weight: 800; color: var(--pink); line-height: 1.2; margin-top: 6px; }
 
-.panel { background: var(--panel); border-top: 1px solid var(--line); padding: 14px 14px calc(12px + var(--safe-b)); display: grid; gap: 10px; max-height: 52dvh; overflow-y: auto; }
+.panel { background: var(--panel); border-top: 1px solid var(--line); padding: 12px 14px calc(12px + var(--safe-b)); display: grid; gap: 10px; max-height: 52dvh; overflow-y: auto; }
 .panel h2 { margin: 0; font-size: 1.1rem; }
 .checks { display: grid; gap: 4px; }
-.check { display: grid; grid-template-columns: 22px 1fr; gap: 8px; font-size: .88rem; line-height: 1.5; }
+.check { display: grid; grid-template-columns: 22px 1fr; gap: 8px; font-size: .92rem; line-height: 1.5; }
 .check .ic { font-weight: 800; text-align: center; }
 .check.ok .ic { color: var(--ok); }
-.check.ng .ic { color: var(--warn); }
+.check.ng .ic, .check.ng b { color: var(--warn); }
 .check.wait .ic { color: var(--muted); }
 .seg { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; background: #24222c; border-radius: 12px; padding: 4px; }
 .seg button { border: 0; background: transparent; color: var(--muted); padding: 9px 4px; font-size: .82rem; border-radius: 9px; }
@@ -124,8 +124,9 @@ body.mirror .stage video, body.mirror .stage canvas { transform: scaleX(-1); }
 .hold { height: 6px; border-radius: 9px; background: #2a2833; overflow: hidden; }
 .hold i { display: block; height: 100%; width: 0; background: var(--ok); }
 #meter:empty { display: none; }
-#meter svg { width: 100%; max-height: 110px; height: auto; display: block; }
+#meter svg { width: 100%; max-height: 96px; height: auto; display: block; }
 #hint { margin: 0; font-size: 1.05rem; font-weight: 700; color: var(--pink); min-height: 1.5em; }
+#hint:empty { display: none; }
 .chips { display: flex; gap: 8px; flex-wrap: wrap; }
 .chips span { font-size: .85rem; padding: 4px 10px; border-radius: 999px; background: #2a2833; color: var(--muted); }
 .chips span.ok { background: rgba(95,211,154,.15); color: var(--ok); }
@@ -143,9 +144,11 @@ body.mirror .stage video, body.mirror .stage canvas { transform: scaleX(-1); }
 
 /* 全身のときは下の欄を小さくして、映像と大きな字を見せる */
 .studio.far .panel .nowhead, .studio.far .panel #meter, .studio.far .panel #hint, .studio.far .panel .steps { display: none; }
+.studio.far .pill { font-size: 1rem; padding: 7px 14px; }
+.studio.far .hold { height: 10px; }
 
 /* 区切りの案内 */
-.overlay { position: absolute; inset: 0; display: grid; place-items: center; background: rgba(8,7,11,.78); backdrop-filter: blur(4px); -webkit-backdrop-filter: blur(4px); padding: 16px; z-index: 4; overflow-y: auto; }
+.overlay { position: fixed; inset: 0; display: grid; place-items: center; background: rgba(8,7,11,.78); backdrop-filter: blur(4px); -webkit-backdrop-filter: blur(4px); padding: calc(16px + var(--safe-t)) 16px calc(16px + var(--safe-b)); z-index: 4; overflow-y: auto; }
 .phasecard { width: min(520px, 100%); background: var(--panel); border: 2px solid var(--pink); border-radius: 22px; padding: 20px; display: grid; gap: 6px; justify-items: center; text-align: center; }
 .phasecard .picto { width: min(120px, 30vw); }
 .phasecard .eyebrow { margin-top: 6px; }
@@ -153,7 +156,7 @@ body.mirror .stage video, body.mirror .stage canvas { transform: scaleX(-1); }
 .phasecard .place { font-size: 1.05rem; font-weight: 700; margin: 0; }
 .phasecard p { margin: 0; color: #d9d7e1; font-size: .92rem; }
 .phasecard .tip { color: var(--muted); font-size: .85rem; }
-.phasecard button { margin-top: 8px; min-width: 60%; }
+.phasecard button { margin-top: 10px; width: 100%; padding: 16px; font-size: 1.05rem; border-radius: 14px; }
 .phasecard .left { color: var(--muted); font-size: .85rem; font-variant-numeric: tabular-nums; }
 
 /* ---------- おわり ---------- */
