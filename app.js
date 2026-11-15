@@ -566,6 +566,7 @@ async function capturePhoto(verified) {
   const best = shots[0];
   buzz(40);
   flash();
+  if (step.doneSay) cue(step.doneSay); // 目を閉じている時など、画面が見えない手順の知らせ
   const base = fileBase(step);
   const jpg = await toJpeg(best.c);
   const thumb = thumbOf(best.c);

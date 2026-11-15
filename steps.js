@@ -229,8 +229,8 @@ export const STEPS = [
         return !S.ctx.winkSide || (l > r ? "L" : "R") !== S.ctx.winkSide;
       },
     }),
-  expr("ex_eyes_closed", "目を閉じる", "両目をやさしく閉じてください。合図の音が鳴るまでそのまま。", "closed",
-    "目の閉じ", (bs) => Math.min(one(bs, "eyeBlinkLeft"), one(bs, "eyeBlinkRight")), 0.6, 1, { hold: 500 }),
+  expr("ex_eyes_closed", "目を閉じる", "両目をやさしく閉じてください。「目を開けて」と声がするまでそのまま。", "closed",
+    "目の閉じ", (bs) => Math.min(one(bs, "eyeBlinkLeft"), one(bs, "eyeBlinkRight")), 0.6, 1, { hold: 500, more: { doneSay: "撮れました。目を開けてください。" } }),
   expr("ex_a", "「あ」の口", "目を開けてください。口の形を撮ります。「あ」の口で止めてください。", "a",
     "口の開き", (bs) => one(bs, "jawOpen"), 0.38, 1, { prep: 2500, hold: 300 }),
   expr("ex_i", "「い」の口", "「い」の口。", "i",
